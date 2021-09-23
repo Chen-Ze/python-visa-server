@@ -59,8 +59,10 @@ class InstrumentController:
                 controller.enable_source()
                 return { }
             elif query["task"] == "measure-smu-voltage":
+                controller.measure_voltage()
                 return { "read": controller.voltage }
             elif query["task"] == "measure-smu-current":
+                controller.measure_current()
                 return { "read": controller.current }
         elif model == "Model2600":
             print("Entry 2600")
