@@ -6,6 +6,7 @@ import threading
 from keithley2600 import Keithley2600
 from keithley2600.keithley_driver import Keithley2600 as Keithley2600Controller
 from pymeasure.instruments.keithley import Keithley2400
+import pi_lightfield as pi
 
 
 STB_DATA_READY = 1
@@ -110,6 +111,16 @@ class InstrumentController:
                 return { "read": controller.smua.measure.v() }
             elif query["task"] == "measure-smub-voltage":
                 return { "read": controller.smub.measure.v() }
+        elif model == "LightField":
+            if query["task"] == "activate":
+                pi.try_activate_window()
+                return { }
+            elif query["task"] == "spectrum":
+                pi.get_spectrum_direct()
+                return { }
+            elif query["task"] == "save-spectrum":
+                pi.get_spectrum_autosave()
+                return { "spectrum": [], "wavelengths": [] }
 
     def write(self, name, command):
         instrument = self.instruments[name]
