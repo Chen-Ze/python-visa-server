@@ -1,6 +1,13 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs, parse_qsl
 import logging
+
+import os
+import sys
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+
 import instrument_control
 
 instrument_controller = instrument_control.InstrumentController()
