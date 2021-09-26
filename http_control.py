@@ -2,6 +2,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs, parse_qsl
 import logging
 
+import deprecation
+
 import os
 import sys
 
@@ -11,6 +13,7 @@ sys.path.append(file_dir)
 import instrument_control
 
 instrument_controller = instrument_control.InstrumentController()
+
 
 class InstrumentHandler(BaseHTTPRequestHandler):
     def _set_response(self):
@@ -39,6 +42,7 @@ class InstrumentHandler(BaseHTTPRequestHandler):
         self._set_response()
         self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
 
+@deprecation.deprecated()
 def run(server_class=HTTPServer, handler_class=InstrumentHandler, port=8888):
     logging.basicConfig(level=logging.INFO)
     server_address = ('', port)
