@@ -1,12 +1,31 @@
 import pyvisa
 import json
 import sys
-import traceback
+from traceback import format_exc
+import coloredlogs
+import logging
 import threading
 from keithley2600 import Keithley2600
 from keithley2600.keithley_driver import Keithley2600 as Keithley2600Controller
 from pymeasure.instruments.keithley import Keithley2400
 import pi_lightfield as pi
+
+
+logger = logging.getLogger("instrument_control")
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+
+fileFormatter = coloredlogs.BasicFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+loggerFileHandler = logging.FileHandler('instrument.log')
+loggerFileHandler.setLevel(logging.DEBUG)
+loggerFileHandler.setFormatter(fileFormatter)
+logger.addHandler(loggerFileHandler)
+
+streamFormatter = coloredlogs.ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+loggerStreamHandler = logging.StreamHandler()
+loggerStreamHandler.setLevel(logging.ERROR)
+loggerStreamHandler.setFormatter(streamFormatter)
+logger.addHandler(loggerStreamHandler)
 
 
 STB_DATA_READY = 1
@@ -66,9 +85,7 @@ class InstrumentController:
                 controller.measure_current()
                 return { "read": controller.current }
         elif model == "Model2600":
-            print("Entry 2600")
             controller = self.model2600s[name]
-            print(controller)
             if query["task"] == "set-smua-off":
                 controller.smua.source.output = controller.smua.OUTPUT_OFF
                 return { }
@@ -160,6 +177,7 @@ class InstrumentController:
         return { "name": name, "state": instrument.lock_state }
 
     def handle(self, query):
+        logger.info("Query: %s", json.dumps(query))
         try:
             self.mutex_lock.acquire()
             command = query["function"]
@@ -188,9 +206,14 @@ class InstrumentController:
             elif command == "watchLock":
                 return json.dumps(self.watch_lock(query["name"]))
             else:
-                return json.dumps({ "error": "Invalid Command." })
+                raise Exception('Invalid Command')
         except Exception as e:
-            ex_type, ex_value, ex_traceback = sys.exc_info()
-            return json.dumps({ "error": str(ex_value), "errorType": str(ex_type), "errorTraceback": str(ex_traceback) })
+            logger.error('%s\nFor query %s\n%s', repr(e), json.dumps(query), format_exc())
+            return json.dumps({
+                "error": repr(e),
+                "errorType": str(type(e)),
+                "errorTraceback": format_exc(),
+                "query": json.dumps(query)
+            })
         finally:
             self.mutex_lock.release()
