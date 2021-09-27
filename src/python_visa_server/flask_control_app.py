@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
 
-import instrument_control
+import python_visa_server.instrument_control as instrument_control
 
 instrument_controller = instrument_control.InstrumentController()
 

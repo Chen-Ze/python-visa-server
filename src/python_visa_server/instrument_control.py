@@ -8,7 +8,7 @@ import threading
 from keithley2600 import Keithley2600
 from keithley2600.keithley_driver import Keithley2600 as Keithley2600Controller
 from pymeasure.instruments.keithley import Keithley2400
-import pi_lightfield as pi
+import python_visa_additional_control.lightfield.pi_lightfield as pi
 
 
 logger = logging.getLogger("instrument_control")

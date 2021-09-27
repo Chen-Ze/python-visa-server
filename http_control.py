@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs, parse_qsl
 import logging
+import coloredlogs
 
 import deprecation
 
@@ -9,11 +10,15 @@ import sys
 
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
+src_dir = os.path.join(file_dir, "src")
+sys.path.append(src_dir)
 
-import instrument_control
+import src.python_visa_server.instrument_control as instrument_control
 
 instrument_controller = instrument_control.InstrumentController()
 
+coloredlogs.install()
+logging.warning("Module http_control is deprecated.")
 
 class InstrumentHandler(BaseHTTPRequestHandler):
     def _set_response(self):

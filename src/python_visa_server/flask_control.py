@@ -3,7 +3,7 @@ import argparse
 import logging
 import coloredlogs
 
-import flask_control_app
+import python_visa_server.flask_control_app as flask_control_app
 
 parser = argparse.ArgumentParser(description='Serve the flask app for instrument control.')
 parser.add_argument('--port', metavar='port', type=int, help='port for the', default=8888)
